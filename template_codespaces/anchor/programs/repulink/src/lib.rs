@@ -8,6 +8,9 @@ const MAX_TITLE_LEN: usize = 64;
 const MAX_DESCRIPTION_LEN: usize = 256;
 const MAX_CLIENT_NAME_LEN: usize = 64;
 const MAX_CLIENT_EMAIL_LEN: usize = 128;
+const MAX_CLIENT_LINKEDIN_LEN: usize = 128;
+const MAX_CLIENT_TWITTER_LEN: usize = 64;
+const MAX_CLIENT_EMAIL_REVIEWER_LEN: usize = 128;
 
 // ── Program ───────────────────────────────────────────────────────────────────
 #[program]
@@ -65,6 +68,10 @@ pub mod repulink {
         badge.description = description;
         badge.client_name = client_name;
         badge.client_email = client_email;
+        badge.client_wallet = None;
+        badge.client_linkedin = None;
+        badge.client_twitter = None;
+        badge.client_email_reviewer = None;
         badge.status = BadgeStatus::Pending;
         badge.created_at = Clock::get()?.unix_timestamp;
         badge.approved_at = None;
@@ -74,8 +81,33 @@ pub mod repulink {
         Ok(())
     }
 
-    /// Allows any signer (the client) to approve a Pending badge. Soulbound once approved.
-    pub fn approve_badge(ctx: Context<ReviewBadge>, _badge_index: u32) -> Result<()> {
+    /// Client approves a Pending badge and signs with their identity on-chain.
+    pub fn approve_badge(
+        ctx: Context<ReviewBadge>,
+        _badge_index: u32,
+        client_linkedin: Option<String>,
+        client_twitter: Option<String>,
+        client_email_reviewer: Option<String>,
+    ) -> Result<()> {
+        if let Some(ref linkedin) = client_linkedin {
+            require!(
+                linkedin.len() <= MAX_CLIENT_LINKEDIN_LEN,
+                RepulinkError::InvalidClientLinkedin
+            );
+        }
+        if let Some(ref twitter) = client_twitter {
+            require!(
+                twitter.len() <= MAX_CLIENT_TWITTER_LEN,
+                RepulinkError::InvalidClientTwitter
+            );
+        }
+        if let Some(ref email) = client_email_reviewer {
+            require!(
+                email.len() <= MAX_CLIENT_EMAIL_REVIEWER_LEN,
+                RepulinkError::InvalidClientEmailReviewer
+            );
+        }
+
         let badge = &mut ctx.accounts.badge;
         require!(
             badge.status == BadgeStatus::Pending,
@@ -84,6 +116,11 @@ pub mod repulink {
 
         badge.status = BadgeStatus::Approved;
         badge.approved_at = Some(Clock::get()?.unix_timestamp);
+        badge.client_wallet = Some(ctx.accounts.reviewer.key());
+        badge.client_linkedin = client_linkedin;
+        badge.client_twitter = client_twitter;
+
+        badge.client_email_reviewer = client_email_reviewer;
 
         Ok(())
     }
@@ -186,6 +223,10 @@ pub struct Badge {
     pub description: String,
     pub client_name: String,
     pub client_email: String,
+    pub client_wallet: Option<Pubkey>,
+    pub client_linkedin: Option<String>,
+    pub client_twitter: Option<String>,
+    pub client_email_reviewer: Option<String>,
     pub status: BadgeStatus,
     pub created_at: i64,
     pub approved_at: Option<i64>,
@@ -195,6 +236,8 @@ pub struct Badge {
 impl Badge {
     /// Discriminator(8) + Pubkey(32) + u32(4)
     /// + String(4+64) + String(4+256) + String(4+64) + String(4+128)
+    /// + Option<Pubkey>(1+32)
+    /// + Option<String>(1+4+128) + Option<String>(1+4+64)
     /// + BadgeStatus(1) + i64(8) + Option<i64>(1+8) + u8(1)
     pub const SPACE: usize = 8
         + 32
@@ -203,6 +246,10 @@ impl Badge {
         + (4 + MAX_DESCRIPTION_LEN)
         + (4 + MAX_CLIENT_NAME_LEN)
         + (4 + MAX_CLIENT_EMAIL_LEN)
+        + (1 + 32)
+        + (1 + 4 + MAX_CLIENT_LINKEDIN_LEN)
+        + (1 + 4 + MAX_CLIENT_TWITTER_LEN)
+        + (1 + 4 + MAX_CLIENT_EMAIL_REVIEWER_LEN)
         + 1
         + 8
         + (1 + 8)
@@ -239,6 +286,15 @@ pub enum RepulinkError {
 
     #[msg("Client name must be between 1 and 64 characters")]
     InvalidClientName,
+
+    #[msg("LinkedIn URL must be 128 characters or less")]
+    InvalidClientLinkedin,
+
+    #[msg("Twitter handle must be 64 characters or less")]
+    InvalidClientTwitter,
+
+    #[msg("Reviewer email must be 128 characters or less")]
+    InvalidClientEmailReviewer,
 
     #[msg("Badge is not in Pending status")]
     BadgeNotPending,

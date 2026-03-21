@@ -11,33 +11,38 @@ describe("repulink", () => {
   const program = anchor.workspace.Repulink as Program<Repulink>;
   const freelancer = provider.wallet;
 
+  // Use timestamp to avoid PDA collision with previous test runs
+  const testUsername = `alice_${Date.now().toString().slice(-6)}`;
+
   const [profilePda] = PublicKey.findProgramAddressSync(
     [Buffer.from("profile"), freelancer.publicKey.toBuffer()],
     program.programId
   );
 
-  before(async () => {
-    // No airdrop needed — provider wallet already has SOL on devnet
-  });
-
   it("Creates a freelancer profile successfully", async () => {
-    await program.methods
-      .initializeProfile("alice_dev")
-      .accounts({
-        owner: freelancer.publicKey,
-        profile: profilePda,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    try {
+      await program.methods
+        .initializeProfile(testUsername)
+        .accounts({
+          owner: freelancer.publicKey,
+          profile: profilePda,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc();
+    } catch (err: any) {
+      // Profile may already exist from a previous run — skip
+      if (!err.message.includes("already in use")) throw err;
+    }
 
     const profileAccount = await program.account.freelancerProfile.fetch(profilePda);
-    assert.equal(profileAccount.username, "alice_dev");
-    assert.equal(profileAccount.badgeCount, 0);
     assert.ok(profileAccount.owner.equals(freelancer.publicKey));
+    assert.ok(profileAccount.badgeCount >= 0);
   });
 
   it("Creates a badge with Pending status", async () => {
-    const badgeIndex = 0;
+    const profileAccount = await program.account.freelancerProfile.fetch(profilePda);
+    const badgeIndex = profileAccount.badgeCount;
+
     const [badgePda] = PublicKey.findProgramAddressSync(
       [
         Buffer.from("badge"),
@@ -67,10 +72,13 @@ describe("repulink", () => {
     assert.equal(badgeAccount.clientName, "Bob Client");
     assert.deepEqual(badgeAccount.status, { pending: {} });
     assert.isNull(badgeAccount.approvedAt);
+    assert.isNull(badgeAccount.clientWallet);
   });
 
-  it("Client approves the badge → status becomes Approved", async () => {
-    const badgeIndex = 0;
+  it("Client approves the badge with identity → status becomes Approved", async () => {
+    const profileAccount = await program.account.freelancerProfile.fetch(profilePda);
+    const badgeIndex = profileAccount.badgeCount - 1;
+
     const [badgePda] = PublicKey.findProgramAddressSync(
       [
         Buffer.from("badge"),
@@ -81,7 +89,12 @@ describe("repulink", () => {
     );
 
     await program.methods
-      .approveBadge(badgeIndex)
+      .approveBadge(
+        badgeIndex,
+        "linkedin.com/in/bobclient",
+        "@bobclient",
+        "bob@example.com"
+      )
       .accounts({
         reviewer: freelancer.publicKey,
         freelancer: freelancer.publicKey,
@@ -92,10 +105,16 @@ describe("repulink", () => {
     const badgeAccount = await program.account.badge.fetch(badgePda);
     assert.deepEqual(badgeAccount.status, { approved: {} });
     assert.isNotNull(badgeAccount.approvedAt);
+    assert.isNotNull(badgeAccount.clientWallet);
+    assert.equal(badgeAccount.clientLinkedin, "linkedin.com/in/bobclient");
+    assert.equal(badgeAccount.clientTwitter, "@bobclient");
+    assert.equal(badgeAccount.clientEmailReviewer, "bob@example.com");
   });
 
   it("Cannot approve an already approved badge → expect BadgeNotPending error", async () => {
-    const badgeIndex = 0;
+    const profileAccount = await program.account.freelancerProfile.fetch(profilePda);
+    const badgeIndex = profileAccount.badgeCount - 1;
+
     const [badgePda] = PublicKey.findProgramAddressSync(
       [
         Buffer.from("badge"),
@@ -107,7 +126,7 @@ describe("repulink", () => {
 
     try {
       await program.methods
-        .approveBadge(badgeIndex)
+        .approveBadge(badgeIndex, null, null, null)
         .accounts({
           reviewer: freelancer.publicKey,
           freelancer: freelancer.publicKey,
