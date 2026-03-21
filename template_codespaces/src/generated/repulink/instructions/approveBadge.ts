@@ -7,27 +7,35 @@
  */
 
 import {
+  addDecoderSizePrefix,
+  addEncoderSizePrefix,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
   getAddressEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getOptionDecoder,
+  getOptionEncoder,
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
   getU32Decoder,
   getU32Encoder,
+  getUtf8Decoder,
+  getUtf8Encoder,
   transformEncoder,
   type AccountMeta,
   type AccountSignerMeta,
   type Address,
-  type FixedSizeCodec,
-  type FixedSizeDecoder,
-  type FixedSizeEncoder,
+  type Codec,
+  type Decoder,
+  type Encoder,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
+  type Option,
+  type OptionOrNullable,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
   type TransactionSigner,
@@ -79,28 +87,66 @@ export type ApproveBadgeInstruction<
 export type ApproveBadgeInstructionData = {
   discriminator: ReadonlyUint8Array;
   badgeIndex: number;
+  clientLinkedin: Option<string>;
+  clientTwitter: Option<string>;
+  clientEmailReviewer: Option<string>;
 };
 
-export type ApproveBadgeInstructionDataArgs = { badgeIndex: number };
+export type ApproveBadgeInstructionDataArgs = {
+  badgeIndex: number;
+  clientLinkedin: OptionOrNullable<string>;
+  clientTwitter: OptionOrNullable<string>;
+  clientEmailReviewer: OptionOrNullable<string>;
+};
 
-export function getApproveBadgeInstructionDataEncoder(): FixedSizeEncoder<ApproveBadgeInstructionDataArgs> {
+export function getApproveBadgeInstructionDataEncoder(): Encoder<ApproveBadgeInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
       ["badgeIndex", getU32Encoder()],
+      [
+        "clientLinkedin",
+        getOptionEncoder(
+          addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder()),
+        ),
+      ],
+      [
+        "clientTwitter",
+        getOptionEncoder(
+          addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder()),
+        ),
+      ],
+      [
+        "clientEmailReviewer",
+        getOptionEncoder(
+          addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder()),
+        ),
+      ],
     ]),
     (value) => ({ ...value, discriminator: APPROVE_BADGE_DISCRIMINATOR }),
   );
 }
 
-export function getApproveBadgeInstructionDataDecoder(): FixedSizeDecoder<ApproveBadgeInstructionData> {
+export function getApproveBadgeInstructionDataDecoder(): Decoder<ApproveBadgeInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["badgeIndex", getU32Decoder()],
+    [
+      "clientLinkedin",
+      getOptionDecoder(addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())),
+    ],
+    [
+      "clientTwitter",
+      getOptionDecoder(addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())),
+    ],
+    [
+      "clientEmailReviewer",
+      getOptionDecoder(addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())),
+    ],
   ]);
 }
 
-export function getApproveBadgeInstructionDataCodec(): FixedSizeCodec<
+export function getApproveBadgeInstructionDataCodec(): Codec<
   ApproveBadgeInstructionDataArgs,
   ApproveBadgeInstructionData
 > {
@@ -119,6 +165,9 @@ export type ApproveBadgeAsyncInput<
   freelancer: Address<TAccountFreelancer>;
   badge?: Address<TAccountBadge>;
   badgeIndex: ApproveBadgeInstructionDataArgs["badgeIndex"];
+  clientLinkedin: ApproveBadgeInstructionDataArgs["clientLinkedin"];
+  clientTwitter: ApproveBadgeInstructionDataArgs["clientTwitter"];
+  clientEmailReviewer: ApproveBadgeInstructionDataArgs["clientEmailReviewer"];
 };
 
 export async function getApproveBadgeInstructionAsync<
@@ -198,6 +247,9 @@ export type ApproveBadgeInput<
   freelancer: Address<TAccountFreelancer>;
   badge: Address<TAccountBadge>;
   badgeIndex: ApproveBadgeInstructionDataArgs["badgeIndex"];
+  clientLinkedin: ApproveBadgeInstructionDataArgs["clientLinkedin"];
+  clientTwitter: ApproveBadgeInstructionDataArgs["clientTwitter"];
+  clientEmailReviewer: ApproveBadgeInstructionDataArgs["clientEmailReviewer"];
 };
 
 export function getApproveBadgeInstruction<

@@ -71,6 +71,10 @@ export type Badge = {
   description: string;
   clientName: string;
   clientEmail: string;
+  clientWallet: Option<Address>;
+  clientLinkedin: Option<string>;
+  clientTwitter: Option<string>;
+  clientEmailReviewer: Option<string>;
   status: BadgeStatus;
   createdAt: bigint;
   approvedAt: Option<bigint>;
@@ -84,6 +88,10 @@ export type BadgeArgs = {
   description: string;
   clientName: string;
   clientEmail: string;
+  clientWallet: OptionOrNullable<Address>;
+  clientLinkedin: OptionOrNullable<string>;
+  clientTwitter: OptionOrNullable<string>;
+  clientEmailReviewer: OptionOrNullable<string>;
   status: BadgeStatusArgs;
   createdAt: number | bigint;
   approvedAt: OptionOrNullable<number | bigint>;
@@ -101,6 +109,25 @@ export function getBadgeEncoder(): Encoder<BadgeArgs> {
       ["description", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
       ["clientName", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
       ["clientEmail", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
+      ["clientWallet", getOptionEncoder(getAddressEncoder())],
+      [
+        "clientLinkedin",
+        getOptionEncoder(
+          addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder()),
+        ),
+      ],
+      [
+        "clientTwitter",
+        getOptionEncoder(
+          addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder()),
+        ),
+      ],
+      [
+        "clientEmailReviewer",
+        getOptionEncoder(
+          addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder()),
+        ),
+      ],
       ["status", getBadgeStatusEncoder()],
       ["createdAt", getI64Encoder()],
       ["approvedAt", getOptionEncoder(getI64Encoder())],
@@ -120,6 +147,19 @@ export function getBadgeDecoder(): Decoder<Badge> {
     ["description", addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
     ["clientName", addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
     ["clientEmail", addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
+    ["clientWallet", getOptionDecoder(getAddressDecoder())],
+    [
+      "clientLinkedin",
+      getOptionDecoder(addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())),
+    ],
+    [
+      "clientTwitter",
+      getOptionDecoder(addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())),
+    ],
+    [
+      "clientEmailReviewer",
+      getOptionDecoder(addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())),
+    ],
     ["status", getBadgeStatusDecoder()],
     ["createdAt", getI64Decoder()],
     ["approvedAt", getOptionDecoder(getI64Decoder())],

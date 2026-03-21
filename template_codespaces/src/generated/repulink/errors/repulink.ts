@@ -22,15 +22,24 @@ export const REPULINK_ERROR__INVALID_TITLE = 0x1771; // 6001
 export const REPULINK_ERROR__INVALID_DESCRIPTION = 0x1772; // 6002
 /** InvalidClientName: Client name must be between 1 and 64 characters */
 export const REPULINK_ERROR__INVALID_CLIENT_NAME = 0x1773; // 6003
+/** InvalidClientLinkedin: LinkedIn URL must be 128 characters or less */
+export const REPULINK_ERROR__INVALID_CLIENT_LINKEDIN = 0x1774; // 6004
+/** InvalidClientTwitter: Twitter handle must be 64 characters or less */
+export const REPULINK_ERROR__INVALID_CLIENT_TWITTER = 0x1775; // 6005
+/** InvalidClientEmailReviewer: Reviewer email must be 128 characters or less */
+export const REPULINK_ERROR__INVALID_CLIENT_EMAIL_REVIEWER = 0x1776; // 6006
 /** BadgeNotPending: Badge is not in Pending status */
-export const REPULINK_ERROR__BADGE_NOT_PENDING = 0x1774; // 6004
+export const REPULINK_ERROR__BADGE_NOT_PENDING = 0x1777; // 6007
 /** BadgeCountOverflow: Badge count overflow: maximum number of badges reached */
-export const REPULINK_ERROR__BADGE_COUNT_OVERFLOW = 0x1775; // 6005
+export const REPULINK_ERROR__BADGE_COUNT_OVERFLOW = 0x1778; // 6008
 
 export type RepulinkError =
   | typeof REPULINK_ERROR__BADGE_COUNT_OVERFLOW
   | typeof REPULINK_ERROR__BADGE_NOT_PENDING
+  | typeof REPULINK_ERROR__INVALID_CLIENT_EMAIL_REVIEWER
+  | typeof REPULINK_ERROR__INVALID_CLIENT_LINKEDIN
   | typeof REPULINK_ERROR__INVALID_CLIENT_NAME
+  | typeof REPULINK_ERROR__INVALID_CLIENT_TWITTER
   | typeof REPULINK_ERROR__INVALID_DESCRIPTION
   | typeof REPULINK_ERROR__INVALID_TITLE
   | typeof REPULINK_ERROR__INVALID_USERNAME;
@@ -40,7 +49,10 @@ if (process.env.NODE_ENV !== "production") {
   repulinkErrorMessages = {
     [REPULINK_ERROR__BADGE_COUNT_OVERFLOW]: `Badge count overflow: maximum number of badges reached`,
     [REPULINK_ERROR__BADGE_NOT_PENDING]: `Badge is not in Pending status`,
+    [REPULINK_ERROR__INVALID_CLIENT_EMAIL_REVIEWER]: `Reviewer email must be 128 characters or less`,
+    [REPULINK_ERROR__INVALID_CLIENT_LINKEDIN]: `LinkedIn URL must be 128 characters or less`,
     [REPULINK_ERROR__INVALID_CLIENT_NAME]: `Client name must be between 1 and 64 characters`,
+    [REPULINK_ERROR__INVALID_CLIENT_TWITTER]: `Twitter handle must be 64 characters or less`,
     [REPULINK_ERROR__INVALID_DESCRIPTION]: `Description must be between 1 and 256 characters`,
     [REPULINK_ERROR__INVALID_TITLE]: `Title must be between 1 and 64 characters`,
     [REPULINK_ERROR__INVALID_USERNAME]: `Username must be between 1 and 32 characters`,
