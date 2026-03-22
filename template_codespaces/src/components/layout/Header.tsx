@@ -26,18 +26,20 @@ export function Header() {
         <div className="flex items-center gap-3">
           {status === "connected" && shortAddress ? (
             <>
-              
+              <a
                 href="/dashboard"
                 className="hidden sm:inline-flex items-center rounded-lg border border-border-low bg-card px-3 py-1.5 text-sm font-medium transition hover:-translate-y-0.5 hover:shadow-sm"
               >
                 Dashboard
               </a>
+
               <div className="flex items-center gap-2 rounded-lg border border-border-low bg-cream px-3 py-1.5">
                 <span className="h-2 w-2 rounded-full bg-green-500" />
                 <span className="font-mono text-xs text-foreground">
                   {shortAddress}
                 </span>
               </div>
+
               <button
                 onClick={() => disconnect()}
                 className="rounded-lg border border-border-low bg-card px-3 py-1.5 text-sm font-medium transition hover:-translate-y-0.5 hover:shadow-sm"

@@ -115,7 +115,6 @@ export function ApproveBadgePage() {
   return (
     <Layout>
       <div className="mx-auto max-w-md flex flex-col gap-8">
-
         {/* Header */}
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">

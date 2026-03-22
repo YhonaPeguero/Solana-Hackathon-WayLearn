@@ -40,7 +40,7 @@ export function PublicProfilePage() {
   if (notFound || !profile) {
     return (
       <Layout>
-        <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+        <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
           <p className="text-base font-medium text-foreground">
             Profile not found
           </p>
@@ -58,14 +58,11 @@ export function PublicProfilePage() {
     );
   }
 
-  const approvedBadges = badges.filter(
-    (b) => "approved" in b.account.status
-  );
+  const approvedBadges = badges.filter((b) => "approved" in b.account.status);
 
   return (
     <Layout>
       <div className="flex flex-col gap-8">
-
         {/* Profile header */}
         <section className="rounded-2xl border border-border-low bg-card p-6 space-y-4">
           <div className="flex items-center gap-4">
@@ -110,7 +107,7 @@ export function PublicProfilePage() {
           </div>
 
           {/* Verified on Solana */}
-          <div className="flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 w-fit">
+          <div className="flex w-fit items-center gap-2 rounded-lg bg-green-50 px-3 py-2">
             <span className="h-2 w-2 rounded-full bg-green-500" />
             <p className="text-xs font-medium text-green-700">
               Verified on Solana devnet

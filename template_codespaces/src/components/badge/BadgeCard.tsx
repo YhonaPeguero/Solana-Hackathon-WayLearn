@@ -1,6 +1,5 @@
-import { type BadgeWithPda } from "../../types/repulink";
+import { type BadgeWithPda, isBadgeApproved } from "../../types/repulink";
 import { StatusBadge } from "../ui/StatusBadge";
-import { isBadgeApproved } from "../../types/repulink";
 
 interface BadgeCardProps {
   badge: BadgeWithPda;
@@ -17,9 +16,7 @@ export function BadgeCard({ badge, onShare }: BadgeCardProps) {
   );
 
   return (
-    <article className="flex flex-col gap-4 rounded-2xl border border-border-low bg-card p-5 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5">
-      
-      {/* Header */}
+    <article className="flex flex-col gap-4 rounded-2xl border border-border-low bg-card p-5 transition hover:-translate-y-0.5">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
           <p className="text-base font-semibold leading-tight text-foreground">
@@ -30,12 +27,10 @@ export function BadgeCard({ badge, onShare }: BadgeCardProps) {
         <StatusBadge status={account.status} />
       </div>
 
-      {/* Description */}
       <p className="text-sm leading-relaxed text-muted line-clamp-2">
         {account.description}
       </p>
 
-      {/* Client info */}
       <div className="rounded-xl border border-border-low bg-cream/30 px-4 py-3 space-y-1">
         <p className="text-xs uppercase tracking-wide text-muted">Endorsed by</p>
         <p className="text-sm font-medium text-foreground">{account.clientName}</p>
@@ -44,8 +39,8 @@ export function BadgeCard({ badge, onShare }: BadgeCardProps) {
         {isApproved && (
           <div className="mt-2 flex flex-wrap gap-2">
             {account.clientLinkedin && (
-              
-                href={`https://${account.clientLinkedin.replace(/^https?:\/\//, "")}`}
+              <a // ✅ Corregido
+                href={"https://" + account.clientLinkedin.replace(/^https?:\/\//, "")}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100 transition"
@@ -54,8 +49,8 @@ export function BadgeCard({ badge, onShare }: BadgeCardProps) {
               </a>
             )}
             {account.clientTwitter && (
-              
-                href={`https://twitter.com/${account.clientTwitter.replace(/^@/, "")}`}
+              <a // ✅ Corregido
+                href={"https://twitter.com/" + account.clientTwitter.replace(/^@/, "")}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1 rounded-md bg-sky-50 px-2 py-1 text-xs font-medium text-sky-700 hover:bg-sky-100 transition"
@@ -72,7 +67,6 @@ export function BadgeCard({ badge, onShare }: BadgeCardProps) {
         )}
       </div>
 
-      {/* Share button — only for pending badges */}
       {!isApproved && onShare && (
         <button
           onClick={() => onShare(badge)}
