@@ -3,15 +3,15 @@ import { useWalletConnection } from "@solana/react-hooks";
 import { Layout } from "../components/layout/Layout";
 import { useRepulink } from "../hooks/useRepulink";
 import { type Address } from "@solana/kit";
-import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, ShieldCheck, Mail, Linkedin, Twitter, AlertCircle, ArrowRight, XCircle } from "lucide-react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { CheckCircle2, ShieldCheck, Mail, Linkedin, Twitter, ArrowRight, XCircle } from "lucide-react";
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
 };
@@ -260,9 +260,11 @@ export function ApproveBadgePage() {
                 initial={{ opacity: 0, height: 0, scale: 0.95 }}
                 animate={{ opacity: 1, height: "auto", scale: 1 }}
                 exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                role="status"
+                aria-live="polite"
                 className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-medium text-primary-light flex items-center gap-2"
             >
-                <div className="h-2 w-2 rounded-full bg-primary-light shadow-[0_0_8px_rgba(184,122,255,0.8)] animate-pulse" />
+                <div className="h-2 w-2 rounded-full bg-primary-light shadow-[0_0_8px_rgba(184,122,255,0.8)] animate-[pulse-glow_2s_infinite]" />
                 {txStatus}
             </motion.div>
             )}
@@ -273,6 +275,7 @@ export function ApproveBadgePage() {
           <button
             onClick={handleReject}
             disabled={isSending}
+            aria-busy={isSending}
             className="group relative flex-1 flex items-center justify-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-4 py-4 text-sm font-bold text-white/50 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 transition-all disabled:opacity-50"
           >
             {isSending ? "..." : (
@@ -284,6 +287,7 @@ export function ApproveBadgePage() {
           <button
             onClick={handleApprove}
             disabled={isSending}
+            aria-busy={isSending}
             className="group relative flex-[2] flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-foreground px-4 py-4 text-base font-bold text-background transition-all hover:scale-[1.02] active:scale-95 disabled:pointer-events-none disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-light opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

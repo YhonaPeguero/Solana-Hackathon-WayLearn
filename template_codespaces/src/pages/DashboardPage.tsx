@@ -102,7 +102,8 @@ export function DashboardPage() {
                     <motion.div 
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400 flex items-center gap-2"
+                        className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400 flex items-center gap-2 relative z-10"
+                        role="alert"
                     >
                         <AlertCircle className="h-4 w-4" />
                         {error}
@@ -115,9 +116,11 @@ export function DashboardPage() {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-medium text-primary-light flex items-center gap-2"
+                            role="status"
+                            aria-live="polite"
+                            className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-medium text-primary-light flex items-center gap-2 relative z-10"
                         >
-                            <div className="h-2 w-2 rounded-full bg-primary-light shadow-[0_0_8px_rgba(184,122,255,0.8)] animate-pulse" />
+                            <div className="h-2 w-2 rounded-full bg-primary-light shadow-[0_0_8px_rgba(184,122,255,0.8)] animate-[pulse-glow_2s_infinite]" />
                             {txStatus}
                         </motion.div>
                     )}
@@ -148,7 +151,7 @@ export function DashboardPage() {
                             </div>
 
                             {isLoading ? (
-                                <div className="h-24 animate-[shimmer_2s_infinite] rounded-2xl bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                                <div className="h-24 shimmer-skeleton rounded-2xl" />
                             ) : profile ? (
                                 <ProfileEditor
                                     profile={profile}
@@ -175,6 +178,7 @@ export function DashboardPage() {
                                         <button
                                             onClick={handleInitializeProfile}
                                             disabled={isSending || !username.trim()}
+                                            aria-busy={isSending}
                                             className="group relative flex items-center justify-center overflow-hidden rounded-xl bg-primary px-8 py-3 text-sm font-bold text-white shadow-[0_0_15px_rgba(153,69,255,0.4)] transition hover:bg-primary-light disabled:opacity-50"
                                         >
                                             <span className="relative z-10">

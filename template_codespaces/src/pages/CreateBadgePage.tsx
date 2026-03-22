@@ -236,6 +236,8 @@ export function CreateBadgePage() {
                     animate={{ opacity: 1, height: "auto", scale: 1 }}
                     exit={{ opacity: 0, height: 0, scale: 0.95 }}
                     className="rounded-3xl border border-primary/30 bg-primary/10 p-6 space-y-4 shadow-[0_0_30px_rgba(153,69,255,0.15)] relative overflow-hidden"
+                    role="status"
+                    aria-live="polite"
                 >
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-light via-primary to-primary-light animate-pulse" />
                 
@@ -285,6 +287,7 @@ export function CreateBadgePage() {
           <button
             type="submit"
             disabled={isSending || !isFormValid}
+            aria-busy={isSending}
             className="group relative w-full flex items-center justify-center gap-3 overflow-hidden rounded-2xl bg-foreground px-6 py-4 text-base font-bold text-background transition-all hover:scale-[1.01] active:scale-95 disabled:pointer-events-none disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] mt-2"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-light opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

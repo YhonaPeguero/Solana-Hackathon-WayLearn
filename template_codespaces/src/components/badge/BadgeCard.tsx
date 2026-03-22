@@ -76,6 +76,7 @@ export function BadgeCard({ badge, onShare }: BadgeCardProps) {
                                         href={"https://" + account.clientLinkedin.replace(/^https?:\/\//, "")}
                                         target="_blank"
                                         rel="noreferrer"
+                                        aria-label={`LinkedIn profile for ${account.clientName}`}
                                         className="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 text-[11px] font-semibold text-blue-400 hover:bg-blue-500/20 transition"
                                     >
                                         <Linkedin className="h-3 w-3" /> LinkedIn
@@ -86,6 +87,7 @@ export function BadgeCard({ badge, onShare }: BadgeCardProps) {
                                         href={"https://twitter.com/" + account.clientTwitter.replace(/^@/, "")}
                                         target="_blank"
                                         rel="noreferrer"
+                                        aria-label={`X (Twitter) profile for ${account.clientName}`}
                                         className="inline-flex items-center gap-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 px-2.5 py-1 text-[11px] font-semibold text-sky-400 hover:bg-sky-500/20 transition"
                                     >
                                         <Twitter className="h-3 w-3" /> Twitter

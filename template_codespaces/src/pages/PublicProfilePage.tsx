@@ -39,13 +39,13 @@ export function PublicProfilePage() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="mx-auto max-w-4xl flex flex-col gap-8">
-          <div className="h-40 animate-pulse rounded-3xl border border-white/5 bg-white/5" />
+        <div className="mx-auto max-w-4xl flex flex-col gap-8" aria-busy="true" aria-label="Loading profile">
+          <div className="h-40 shimmer-skeleton rounded-3xl border border-white/5" />
           <div className="grid gap-4 sm:grid-cols-2">
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="h-48 animate-pulse rounded-3xl border border-white/5 bg-white/5"
+                className="h-48 shimmer-skeleton rounded-3xl border border-white/5"
               />
             ))}
           </div>
@@ -181,7 +181,7 @@ export function PublicProfilePage() {
 
         {/* Error */}
         {error && (
-          <motion.div variants={itemVariants} className="rounded-2xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-sm font-medium text-red-200 backdrop-blur-md flex items-center gap-3">
+          <motion.div variants={itemVariants} role="alert" className="rounded-2xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-sm font-medium text-red-200 backdrop-blur-md flex items-center gap-3">
             <ShieldAlert className="h-5 w-5 text-red-400" />
             {error}
           </motion.div>
