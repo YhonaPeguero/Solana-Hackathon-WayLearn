@@ -249,4 +249,4 @@ anchor test --skip-deploy
 
 ---
 
-*RepuLink — Solana LATAM Hackathon 2026*
+*RepuLink — Solana LATAM Hackathon 2026 by: [Yhona Peguero](https://www.linkedin.com/in/yhonatan-peguero/)*
