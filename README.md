@@ -1,119 +1,252 @@
-# Solana Hackathon con WayLearn
-![Banner](./images/BANNERHACKATHON.png)
+# RepuLink
 
-Solana es una blockchain de capa 1, es decir, cuenta con su propia infraestructura y no depende de otras blockchains para funcionar. Se encuentra orientada al alto rendimiento, y fue creada para soportar aplicaciones descentralizadas a gran escala con costos mínimos y confirmaciones casi inmediatas. Su diseño prioriza la eficiencia en la ejecución y la paralelización de transacciones.
+> **Your reputation, portable forever.**  
+> On-chain endorsement badges for freelancers — verified by real clients, owned by you, shareable anywhere.
 
-Rust es el lenguaje principal para desarrollar programas en Solana. A través de él se implementa la lógica on-chain utilizando el modelo de cuentas y programas de la red, permitiendo construir contratos inteligentes seguros, eficientes y altamente optimizables.
+Built on **Solana** · Submitted to **WayLearn x Solana Foundation Hackathon 2026**
 
-Para facilitar el desarrollo en Rust sobre Solana existe Anchor, un framework que simplifica enormemente la creación de programas on-chain. Anchor proporciona:
+---
 
-* Un sistema de validación automática de cuentas mediante macros.
-* Manejo simplificado de serialización y deserialización de datos.
-* Gestión de PDAs (Program Derived Addresses) de forma declarativa.
-* Generación automática de IDL (Interface Definition Language) para facilitar la interacción desde el frontend.
-* Un entorno de testing más sencillo y estructurado.
+## What is RepuLink?
 
-Anchor, nos permite enfocarnos en la lógica del programa en lugar de manejar manualmente detalles de bajo nivel como validaciones repetitivas, manejo de bytes o verificación de firmas. Esto mejora la seguridad, reduce errores comunes y acelera el proceso de desarrollo.
+Freelancers in LATAM and globally build their reputation across Upwork, Fiverr, and direct clients — but that reputation is trapped in each platform. When they switch platforms or work directly, they start from zero.
 
-# Entornos de desarollo
-Hemos preparado el siguiente repositorio para que comiences a trabajar lo antes posible en tu proyecto si la necesidad de instalar nada de forma local!. Para ello, te porporcionamos las siguientes alternativas:
+RepuLink fixes that. When a freelancer completes a project, they send the client a verification link. The client approves it on-chain with their identity (wallet, LinkedIn, Twitter, email). The result is a **soulbound badge** — permanently on Solana, owned by the freelancer, verifiable by anyone with a public profile link.
 
-* Uso de Codespaces 
-* Uso de un Entorno Local (Tu Propia PC)
+No wallet required for clients. No crypto knowledge needed. The blockchain is invisible.
 
-## Codespaces (Github)
-Puedes comenzar dándole Fork a este repositorio (abajo te explicamos cómo 👇)
+---
 
-![fork](./images/fork.png)
+## Features
 
-* Puedes renombrar el repositorio a lo que sea que se ajuste con tu proyecto.
-* Asegúrate de clonar este repositorio a tu cuenta usando el botón **`Fork`**.
-* Presiona el botón **`<> Code`** y luego haz click en la sección **`Codespaces`**
+| Feature | Description |
+|---|---|
+| **Freelancer profile** | Create an on-chain identity with a username and avatar |
+| **Endorsement requests** | Send clients a link to verify your completed work |
+| **Client approval** | Clients approve or reject via a simple link — no wallet required |
+| **Soulbound badges** | Non-transferable NFTs that cannot be faked or sold |
+| **Client identity on-chain** | Approvals store wallet address, LinkedIn, Twitter, and email |
+| **Public profile** | Share a `repulink.app/your-address` link — verifiable by anyone |
+| **Profile editor** | Update username, upload avatar, delete account |
+| **Solana Explorer** | Every badge links directly to the on-chain transaction |
 
-    ![codespaces](./images/codespaces.png)
+---
 
-Por último, presiona **`Create codespace on master`**. Esto abrirá el proyecto en una interfaz gráfica de Visual Studio Code e instalará todas las herramientas necesarias para empezar a programar (es muy importante esperar a que este proceso termine):
+## Architecture
 
-![instalacion](./images/Instalacion.png)
+```
+┌─────────────────────────────────────────────────────┐
+│                    Frontend                          │
+│         Next.js · React · TailwindCSS               │
+│                                                     │
+│  HomePage  →  Dashboard  →  CreateBadge             │
+│                    ↓                                │
+│            ApproveBadge  ←  (client link)           │
+│                    ↓                                │
+│            PublicProfile  (shareable)               │
+└──────────────────────┬──────────────────────────────┘
+                       │  @solana/react-hooks
+                       │  @solana/kit
+                       │  Codama (generated types)
+┌──────────────────────▼──────────────────────────────┐
+│                 Solana Devnet                        │
+│                                                     │
+│  Program: EQEWMBEtLZE7L2WS3iWo88rk8tQ4o8P9djmEJkG8gTFw  │
+│                                                     │
+│  PDAs:                                              │
+│  ├── FreelancerProfile  [seeds: "profile" + owner]  │
+│  └── Badge              [seeds: "badge" + owner + index] │
+│                                                     │
+│  Instructions:                                      │
+│  ├── initialize_profile(username)                   │
+│  ├── update_profile(username)                       │
+│  ├── close_profile()                                │
+│  ├── create_badge(title, description, client_*)     │
+│  ├── approve_badge(index, linkedin, twitter, email) │
+│  └── reject_badge(index)                            │
+└──────────────────────┬──────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────┐
+│                 Helius RPC                          │
+│   getAccountInfo · getProgramAccounts (badge fetch) │
+└─────────────────────────────────────────────────────┘
+```
 
-El proceso de instalación finaliza cuando la terminal se reinicia y queda de la siguiente manera:
+---
 
-![fin](images/fin.png)
+## Endorsement Flow
 
-El `setup.sh` instala lo siguiente:
+```
+Freelancer                    Client
+    │                            │
+    │  1. Create endorsement     │
+    │     request (on-chain)     │
+    │                            │
+    │  2. Copy approval link ──► │  Opens link (no wallet needed)
+    │                            │  Privy creates embedded wallet
+    │                            │  Fills identity (LinkedIn, email...)
+    │                            │  Signs approval on-chain
+    │                            │
+    │  ◄── Badge appears ────────│
+    │      in dashboard          │
+    │      (soulbound NFT)       │
+```
 
-* `rust`
-* dependencias para `Solana`
-* `Solana-cli`
-* `Anchor-cli`
-* `spl-token`
-* `surfpool`
-* `node` y `nvm`
-* `vite`
+---
 
-Además:
+## Tech Stack
 
-* Crea una wallet que pueds consultar con: `solana address`
-* Configura el entorno de RPC a devnet
+**Backend (on-chain)**
+- Rust + Anchor framework
+- Token Extensions (soulbound / non-transferable logic)
+- PDA accounts for profile and badge state
+- Deployed on Solana Devnet
 
-Finalmente, crea una carpeta llamada `template_codespaces` donde se encuentra todo lo necesario para desarrollar el proyecto, tanto la parte del `frontend` como el `backend`.
+**Frontend**
+- React + Vite + TypeScript
+- TailwindCSS
+- `@solana/react-hooks` + `@solana/kit`
+- Codama (auto-generated program client from IDL)
+- Helius RPC (on-chain data fetching)
+- Privy (embedded wallet for clients — no extension required)
 
-> ⚠️ Al terminar el proceso de preparación del entorno es necesario ejecutar el siguiente comando: 
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- Rust + Cargo
+- Solana CLI
+- Anchor CLI
+
+### 1. Clone and setup
+
+```bash
+git clone https://github.com/YhonaPeguero/Solana-Hackathon-WayLearn.git
+cd Solana-Hackathon-WayLearn/template_codespaces
+npm install
+```
+
+### 2. Environment variables
+
+Copy the example file and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+```env
+VITE_HELIUS_API_KEY=your_helius_api_key
+VITE_HELIUS_RPC_URL=https://devnet.helius-rpc.com/?api-key=your_helius_api_key
+VITE_PROGRAM_ID=EQEWMBEtLZE7L2WS3iWo88rk8tQ4o8P9djmEJkG8gTFw
+```
+
+Get your Helius API key at [dashboard.helius.dev](https://dashboard.helius.dev).
+
+### 3. Build the Anchor program
+
+```bash
+cd anchor
+anchor build
+anchor deploy
+```
+
+### 4. Regenerate Codama types
+
+```bash
+cd ..
+npm run setup
+```
+
+### 5. Run the frontend
+
+```bash
+npm run dev
+```
+
+Visit `http://localhost:5173`
+
+---
+
+## Using Codespaces
+
+The repo includes a full Codespaces setup. Just open it in GitHub and click **Create codespace** — Rust, Solana CLI, Anchor, and Node are installed automatically.
+
+After the setup finishes, run:
 
 ```bash
 export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+cd template_codespaces
+npm install && npm run dev
 ```
 
-> ℹ️ Recuerda moverte a la carpeta creada con el comando `cd template_codespaces`. Para correr proyecto e interactuar con el frontend es necesario ejecutar el comando `npm install` segudo de `npm run dev`, lo que levantara el puerto 5173 habilitando la siguiente dirección: `http://localhost:5173`
+---
 
-> ℹ️ El build del proyecto se hace con `anchor build` mientras que el despliegue con `anchor deploy`
+## Program ID
 
-> ⚠️ Antes de hacer el deploy a la devnet asegurate que en el archivo `anchor.toml` en la seccion `provider` sea: `cluster = "devnet"`, de lo contrario todas las pruebas a realizar se harán local (dentro de codespaces).
+```
+EQEWMBEtLZE7L2WS3iWo88rk8tQ4o8P9djmEJkG8gTFw
+```
 
+[View on Solana Explorer →](https://explorer.solana.com/address/EQEWMBEtLZE7L2WS3iWo88rk8tQ4o8P9djmEJkG8gTFw?cluster=devnet)
 
-## Entorno Local
+---
 
-> ℹ️ Se recomienta el uso de sistemas operativos base linux o en su defecto WSL en el caso de usar Windows
+## Project Structure
 
-Lo primero que se debe hacer es un `git clone` al repositorio lo que se hace corriendo el siguiente comando en la terminal: 
+```
+template_codespaces/
+├── anchor/
+│   ├── programs/repulink/src/lib.rs   ← Anchor program
+│   ├── tests/repulink.ts              ← Integration tests
+│   └── Anchor.toml
+├── src/
+│   ├── pages/                         ← Route-level components
+│   │   ├── HomePage.tsx
+│   │   ├── DashboardPage.tsx
+│   │   ├── CreateBadgePage.tsx
+│   │   ├── ApproveBadgePage.tsx
+│   │   └── PublicProfilePage.tsx
+│   ├── components/
+│   │   ├── badge/                     ← BadgeCard, BadgeList
+│   │   ├── layout/                    ← Header, Layout
+│   │   ├── profile/                   ← ProfileEditor
+│   │   └── ui/                        ← StatusBadge
+│   ├── hooks/
+│   │   ├── useRepulink.ts             ← On-chain instructions
+│   │   └── useOnChainData.ts          ← Profile + badge fetching
+│   ├── generated/repulink/            ← Codama auto-generated client
+│   └── types/repulink.ts              ← Shared TypeScript types
+└── .env.example
+```
+
+---
+
+## Running Tests
 
 ```bash
-git clone https://github.com/WayLearnLatam/Solana-Hackathon-Template-FullStack.git
-```
-Posteriormente nos movemos mediante `cd Solana-Hackathon-Template-FullStack` a la carpeta del proyecto donde tenemos dos posibles opciones para realizar la instalación:
-
-### Opción 1: instalación full local
-
-Esta alternativa instala todas las dependencias en tu sistema. Para ello es necesario ejecutar el siguiente comando (tomando en cuenta que estas dentro de la carpeta `Solana-Hackathon-Template-FullStack`):
-
-```bash
-chmod +x local-setup.sh
-
-./local-setup.sh
+cd anchor
+anchor test --skip-deploy
 ```
 
-### Opción 2 (recomendado): instalación con devcontainer (docker)
+4 tests cover the full badge lifecycle:
+1. Creates a freelancer profile
+2. Creates a badge with Pending status
+3. Client approves the badge → status becomes Approved
+4. Cannot approve an already approved badge → expects `BadgeNotPending` error
 
-> ℹ️ Como requisito es necesario contar con Vscode y tener las extensiones de `devcontainer` y `docker` instaladas. 
+---
 
-Docker es una plataforma que permite crear, ejecutar y gestionar aplicaciones en contenedores. Un contenedor Docker es una unidad estandarizada que empaqueta una aplicación junto con todo lo necesario para ejecutarse: código, bibliotecas, dependencias, herramientas de sistema y tiempo de ejecución. Esto garantiza que la aplicación funcione de forma consistente en cualquier entorno.
+## Built with
 
-Docker se basa en la virtualización a nivel de sistema operativo, compartiendo el kernel del sistema anfitrión, lo que lo hace más ligero y eficiente que las máquinas virtuales tradicionales.
+- [Solana](https://solana.com) — The fastest blockchain for this use case
+- [Anchor](https://anchor-lang.com) — Rust framework for Solana programs
+- [Helius](https://helius.dev) — RPC and DAS API
+- [Codama](https://github.com/codama-idl/codama) — Type-safe program client generation
+- [WayLearn](https://waylearn.io) — Hackathon organizer
 
-Al abrir el proyecto (escribiendo `code .` en la terminal) nos abrirá Vscode con el siguiente mensaje en la parte inferior derecha: 
+---
 
-![devcontainer](./images/devcontainer.png)
-
-Donde daremos clic en `Reopen in Container`
-
-> ⚠️ Si no te aparece entonces da clic en el icono de la campana ubicado en la parte inferior derecha.
-
-En dado caso de que no tengas las extensiones instaladas te aparecerá la siguiente ventana (solo presiona install):
-
-![install](./images/install.png)
-
-> ⚠️ Al terminal la instalación de docker aparecerá de nuevo una ventana emergente en la parte inferior izquierda donde presionaremos `continue`
-
-Una vez empezado el proceso esperar a que termine. Puede tomar un tiempo debido a que se instalan todas las dependencias similar a la instalación en codespaces.
-
->ℹ️ Docuemntación oficial: https://solana.com/developers/templates/react-vite-anchor
+*RepuLink — Solana LATAM Hackathon 2026*
