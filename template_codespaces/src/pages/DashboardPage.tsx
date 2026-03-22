@@ -7,6 +7,7 @@ import { useRepulink } from "../hooks/useRepulink";
 import { useOnChainData } from "../hooks/useOnChainData";
 import { type BadgeWithPda } from "../types/repulink";
 import { type Address } from "@solana/kit";
+import { ReputationCard } from "../components/profile/ReputationCard";
 
 export function DashboardPage() {
     const { wallet, status } = useWalletConnection();
@@ -154,6 +155,15 @@ export function DashboardPage() {
                         isLoading={isLoading}
                     />
                 </section>
+
+                {profile && (
+                    <ReputationCard
+                        profile={profile}
+                        badges={badges}
+                        walletAddress={walletAddress as string}
+                    />
+                )}
+
             </div>
         </Layout>
     );
